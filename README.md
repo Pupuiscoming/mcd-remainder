@@ -7,7 +7,7 @@
 三个人拼一单 ¥44.50，除不尽；套餐里的堡和薯条价值不同，更除不清。<br>
 McRemainder 基于麦当劳中国官方 MCP，把每一份食物拆到人头、算到分、转最少笔账。
 
-![Demo](https://img.shields.io/badge/%F0%9F%8E%AE-Demo_%E9%9B%B6_Token-DA291C?style=for-the-badge)
+[![Demo](https://img.shields.io/badge/%F0%9F%8E%AE-Demo_%E9%9B%B6_Token-DA291C?style=for-the-badge)](https://pupuiscoming.github.io/mcd-remainder/)
 ![MCP](https://img.shields.io/badge/%F0%9F%8D%9F-mcd--mcp_%E5%AE%98%E6%96%B9-FFC72C?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.9%2B_%E9%9B%B6%E4%BE%9D%E8%B5%96-3776AB?style=flat-square)
 ![Tests](https://img.shields.io/badge/Tests-34%2B7%2Be2e_%E5%85%A8%E8%BF%87-3FB950?style=flat-square)
@@ -75,7 +75,8 @@ $ python scripts/cli.py --demo
 
 ### ① 网页 Demo（零 Token，路人即开即玩）
 
-打开 [`demo/index.html`](demo/index.html)（本地双击即可，亦可部署 GitHub Pages）。
+**在线版：https://pupuiscoming.github.io/mcd-remainder/** ，
+本地亦可直接打开 [`demo/index.html`](demo/index.html)。
 菜单、43 个套餐拆解、160 条营养数据全部预取自 MCP 快照，
 纯前端运行，零网络请求、零登录、零 Token。
 
