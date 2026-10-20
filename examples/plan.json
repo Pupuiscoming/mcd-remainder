@@ -1,0 +1,26 @@
+{
+  "city": "合肥",
+  "keyword": "之心城",
+  "people": ["阿强", "小美", "老张"],
+  "payer": "阿强",
+  "shared_rule": "by_amount",
+  "items": [
+    {
+      "code": "9900005462",
+      "qty": 1,
+      "share": [
+        {"person": "阿强", "part": "板烧鸡腿堡"},
+        {"person": "小美", "part": "中薯条"},
+        {"person": "老张", "part": "可乐"}
+      ]
+    },
+    {
+      "code": "515837",
+      "qty": 2,
+      "share": [
+        {"person": "小美", "qty": 1},
+        {"person": "老张", "qty": 1}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "store": "麦当劳合肥之心城餐厅",
+  "payable_cents": 4450,
+  "discount_cents": 0,
+  "lines": [
+    {
+      "product_code": "9900005462",
+      "product_name": "板烧鸡腿堡三件套",
+      "quantity": 1,
+      "is_combo": true,
+      "subtotal_cents": 3450,
+      "units": [
+        {
+          "person": "阿强",
+          "label": "板烧鸡腿堡",
+          "qty": 1.0,
+          "basis": 23.5,
+          "price_src": "menu_code",
+          "amount_cents": 1725
+        },
+        {
+          "person": "小美",
+          "label": "中薯条",
+          "qty": 1.0,
+          "basis": 14.0,
+          "price_src": "menu_code",
+          "amount_cents": 1028
+        },
+        {
+          "person": "老张",
+          "label": "可乐中杯",
+          "qty": 1.0,
+          "basis": 9.5,
+          "price_src": "menu_name",
+          "amount_cents": 697
+        }
+      ]
+    },
+    {
+      "product_code": "515837",
+      "product_name": "圆筒冰淇淋",
+      "quantity": 2,
+      "is_combo": false,
+      "subtotal_cents": 1000,
+      "units": [
+        {
+          "person": "小美",
+          "label": "圆筒冰淇淋",
+          "qty": 1.0,
+          "basis": 5.0,
+          "price_src": "menu",
+          "amount_cents": 500
+        },
+        {
+          "person": "老张",
+          "label": "圆筒冰淇淋",
+          "qty": 1.0,
+          "basis": 5.0,
+          "price_src": "menu",
+          "amount_cents": 500
+        }
+      ]
+    }
+  ],
+  "people": [
+    {
+      "name": "阿强",
+      "food_cents": 1725,
+      "shared_cents": 0,
+      "discount_cents": 0,
+      "total_cents": 1725,
+      "paid_cents": 4450,
+      "kcal": 391.0
+    },
+    {
+      "name": "小美",
+      "food_cents": 1528,
+      "shared_cents": 0,
+      "discount_cents": 0,
+      "total_cents": 1528,
+      "paid_cents": 0,
+      "kcal": 382.0
+    },
+    {
+      "name": "老张",
+      "food_cents": 1197,
+      "shared_cents": 0,
+      "discount_cents": 0,
+      "total_cents": 1197,
+      "paid_cents": 0,
+      "kcal": 240.0
+    }
+  ],
+  "transfers": [
+    {
+      "from": "小美",
+      "to": "阿强",
+      "cents": 1528
+    },
+    {
+      "from": "老张",
+      "to": "阿强",
+      "cents": 1197
+    }
+  ]
+}
