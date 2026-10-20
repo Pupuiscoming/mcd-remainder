@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AA 除不尽 · 麦当劳拼单清算</title>
+<style>
+:root{
+  --red:#DA291C;--red-dark:#B01F13;--red-ink:#C7221B;
+  --gold:#FFC72C;--gold-dark:#D99012;
+  --paper:#FBF6EC;--paper-dark:#F3ECDD;
+  --ink:#231A15;--gray:#6B6157;--light:#A29688;--line:#E8DFCE;
+  --r-md:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+     font:14px/1.65 -apple-system,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
+     padding-bottom:80px}
+.wrap{max-width:660px;margin:0 auto;padding:0 18px}
+
+/* ============ Hero：红底波点 + 商品贴纸 ============ */
+.hero{position:relative;background:var(--red);overflow:hidden;padding:34px 0 120px}
+.hero::before{content:"";position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.14) 2.2px, transparent 2.6px);
+  background-size:22px 22px;opacity:.5}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:26px;
+  background:var(--paper);
+  clip-path:polygon(0 100%,0 60%,4% 100%,8% 60%,12% 100%,16% 60%,20% 100%,24% 60%,28% 100%,32% 60%,36% 100%,40% 60%,44% 100%,48% 60%,52% 100%,56% 60%,60% 100%,64% 60%,68% 100%,72% 60%,76% 100%,80% 60%,84% 100%,88% 60%,92% 100%,96% 60%,100% 100%,100% 60%,100% 100%)}
+.hero .inner{position:relative;z-index:2;max-width:660px;margin:0 auto;padding:0 18px}
+.hero .kicker{display:inline-block;font-size:11.5px;letter-spacing:3px;font-weight:700;
+  color:var(--gold);border:2px solid var(--gold);border-radius:4px;
+  padding:4px 12px;transform:rotate(-1.5deg);margin-bottom:16px}
+.hero h1{font-size:44px;line-height:1.15;letter-spacing:4px;color:#fff;font-weight:900;
+  text-shadow:3px 3px 0 rgba(0,0,0,.22)}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero .sub{margin-top:12px;font-size:14px;color:#FFE9D2;max-width:430px;line-height:1.75}
+.hero .sub b{color:var(--gold)}
+/* 商品贴纸 */
+.sticker{position:absolute;z-index:1;background:#fff;border-radius:14px;padding:8px;
+  box-shadow:0 6px 18px rgba(80,10,0,.35)}
+.sticker img{display:block;width:100%;border-radius:8px}
+.st{width:104px;top:38px;right:4%;transform:rotate(7deg)}
+.st2{width:88px;top:150px;right:20%;transform:rotate(-6deg)}
+.st3{width:96px;top:44px;right:32%;transform:rotate(-10deg)}
+.st4{width:78px;bottom:52px;right:6%;transform:rotate(-4deg)}
+.st5{width:72px;top:170px;right:44%;transform:rotate(5deg)}
+
+/* ============ 主体 ============ */
+.wrap{position:relative;z-index:3}
+section{background:#fff;border-radius:var(--r-md);padding:20px 22px;margin-top:18px;
+  border:1.5px solid var(--line);box-shadow:0 2px 0 rgba(120,90,40,.06)}
+h2{font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.5px}
+h2 .n{width:24px;height:24px;border-radius:6px;background:var(--red);color:#fff;
+  font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;
+  transform:rotate(-3deg)}
+h2 small{color:var(--light);font-weight:400;font-size:12px;margin-left:auto;letter-spacing:0}
+
+.row{display:flex;gap:10px}
+input[type=text]{flex:1;border:1.5px solid var(--line);border-radius:var(--r-md);
+  padding:11px 14px;font-size:14.5px;outline:none;transition:border-color .15s;background:#FFFEFB}
+input[type=text]:focus{border-color:var(--red)}
+button{border:0;border-radius:var(--r-md);padding:11px 18px;font-size:14px;cursor:pointer;
+  background:var(--red);color:#fff;font-weight:700;letter-spacing:1px;
+  box-shadow:0 3px 0 var(--red-dark);transition:transform .08s, box-shadow .08s}
+button:hover{filter:brightness(1.06)}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--red-dark)}
+button.big{width:100%;padding:15px;font-size:16px;margin-top:4px;letter-spacing:2px}
+
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:#FDEEEC;
+  color:var(--red);border-radius:4px;padding:6px 12px;font-size:13.5px;font-weight:700;
+  border:1.5px solid #F5CFC9}
+.chip b{cursor:pointer;opacity:.5;font-weight:400}
+.chip b:hover{opacity:1}
+.hint{font-size:12.5px;color:var(--light);margin-top:10px;line-height:1.7}
+
+/* ============ 搜索 ============ */
+.searchbox{position:relative}
+.results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;
+  border:1.5px solid var(--ink);border-radius:var(--r-md);margin-top:4px;max-height:320px;
+  overflow:auto;z-index:10;box-shadow:6px 6px 0 rgba(35,26,21,.12);display:none}
+.results div{padding:9px 12px;cursor:pointer;font-size:13.5px;display:flex;
+  justify-content:space-between;align-items:center;transition:background .1s}
+.results div:hover{background:#FDF3E3}
+.results .nm{display:flex;align-items:center;gap:10px}
+.results .thumb{width:38px;height:38px;object-fit:contain;background:#fff;
+  border:1px solid var(--line);border-radius:6px;padding:2px}
+.results .price{color:var(--red);font-weight:800;font-variant-numeric:tabular-nums}
+.results .tag{font-size:10px;color:var(--ink);background:var(--gold);border-radius:3px;
+  padding:1.5px 6px;font-weight:800}
+
+/* ============ 订单行 ============ */
+.orderline{border:1.5px solid var(--line);border-radius:var(--r-md);padding:12px 14px;margin-top:12px}
+.orderline .head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.orderline .thumb{width:44px;height:44px;object-fit:contain;background:#fff;
+  border:1px solid var(--line);border-radius:8px;padding:2px;flex-shrink:0}
+.orderline .info{flex:1;min-width:0}
+.orderline .info b{font-size:14px}
+.orderline .head .right{display:flex;align-items:center;gap:10px}
+.orderline .head .amt{color:var(--red);font-weight:800;font-variant-numeric:tabular-nums}
+.orderline .del{color:#D8CFC0;cursor:pointer;font-size:16px;padding:0 2px}
+.orderline .del:hover{color:var(--red)}
+.children{margin-top:8px}
+.child{display:flex;align-items:center;gap:9px;padding:6px 0;border-top:1px dashed var(--line);font-size:13px}
+.child:first-child{border-top:0}
+.child .nm{flex:1;color:var(--gray)}
+.child .basis{color:#C2B8A6;font-size:11.5px;font-variant-numeric:tabular-nums}
+.child select{border:1.5px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12.5px;
+  max-width:116px;background:#FFFEFB;outline:none;cursor:pointer;font-weight:600}
+.child select:focus{border-color:var(--red)}
+.estimate{font-size:10px;color:var(--gold-dark);border:1px solid #EBD9A8;
+  border-radius:3px;padding:0.5px 5px;font-weight:700;background:#FFF8E6}
+
+/* ============ 收据小票（结果） ============ */
+.result-card{display:none;margin-top:20px}
+.receipt{background:#fff;border:1.5px solid var(--ink);border-radius:4px;
+  box-shadow:8px 8px 0 rgba(35,26,21,.10);padding:26px 26px 30px;position:relative;
+  animation:pop .4s ease both}
+.receipt::before,.receipt::after{content:"";position:absolute;left:12px;right:12px;height:0;
+  border-top:2px dashed var(--line)}
+.receipt::before{top:52px}
+.receipt::after{bottom:64px}
+.rhead{text-align:center;padding-bottom:16px}
+.rhead .logo{font-size:19px;font-weight:900;letter-spacing:5px}
+.rhead .logo i{font-style:normal;color:var(--red)}
+.rhead .meta{font-size:11px;color:var(--light);margin-top:6px;letter-spacing:1px;
+  font-variant-numeric:tabular-nums}
+.rsum{display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 2px 16px;font-size:13px;color:var(--gray)}
+.rsum .v{font-size:24px;font-weight:900;color:var(--red);font-variant-numeric:tabular-nums}
+.rperson{padding:13px 2px;border-bottom:1px dashed var(--line);
+  animation:pop .4s ease both}
+.rperson .top{display:flex;justify-content:space-between;align-items:baseline}
+.rperson .top b{font-size:14.5px;letter-spacing:1px}
+.rperson .top .money{font-size:17px;font-weight:900;color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.rperson .top .money::before{content:"¥";font-size:12px;color:var(--light);margin-right:1px}
+.rperson ul{list-style:none;margin:6px 0 4px;font-size:12px;color:var(--gray)}
+.rperson ul li{display:flex;justify-content:space-between;padding:2px 0}
+.rperson .meta{font-size:11px;color:var(--light);display:flex;gap:14px;margin-top:4px;
+  font-variant-numeric:tabular-nums}
+.rperson .meta .kcal{color:var(--gold-dark);font-weight:700}
+.rtransfers{padding:16px 2px 4px}
+.rtransfers .t-title{font-size:12px;letter-spacing:2px;color:var(--light);
+  text-align:center;margin-bottom:12px}
+.rtransfer{display:flex;align-items:center;gap:10px;padding:9px 4px;font-size:14px;
+  border-bottom:1px dashed var(--line);animation:pop .4s ease both}
+.rtransfer .who{font-weight:800}
+.rtransfer .arr{color:var(--light);font-size:11px;flex:1;text-align:center;
+  border-bottom:2px dotted #D8CFC0;margin:0 6px;padding-bottom:2px}
+.rtransfer .amt{font-weight:900;color:var(--red);font-variant-numeric:tabular-nums}
+.rverify{text-align:center;margin-top:18px;font-size:12px;color:var(--light);
+  font-variant-numeric:tabular-nums}
+.stamp{position:absolute;right:22px;bottom:74px;width:92px;height:92px;border-radius:50%;
+  border:3px solid var(--red);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;color:var(--red);transform:rotate(-14deg);opacity:.88;
+  animation:stampIn .35s .5s ease both}
+.stamp b{font-size:15px;letter-spacing:2px;font-weight:900}
+.stamp span{font-size:9px;letter-spacing:1px;margin-top:2px}
+.stamp::before{content:"";position:absolute;inset:5px;border-radius:50%;
+  border:1.5px solid var(--red)}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes stampIn{0%{opacity:0;transform:rotate(-14deg) scale(1.7)}
+  70%{opacity:.95;transform:rotate(-14deg) scale(.94)}100%{opacity:.88;transform:rotate(-14deg) scale(1)}}
+.share{background:#fff;border:1.5px dashed var(--gold-dark);border-radius:var(--r-md);
+  padding:12px 16px;font-size:13px;color:#8a6a1a;margin-top:14px;text-align:center;
+  animation:pop .5s ease both}
+footer{text-align:center;font-size:12px;color:#B5AA97;margin-top:30px;line-height:1.9}
+footer a{color:var(--red);text-decoration:none;font-weight:700}
+footer a:hover{text-decoration:underline}
+.warnbar{background:var(--ink);color:#E8DFCE;text-align:center;font-size:12px;padding:9px 16px;
+  letter-spacing:.5px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">MCDONALD'S MCP POWERED</span>
+    <h1>AA <em>除不尽</em></h1>
+    <p class="sub">三个人拼一单 ¥44.50，除不尽；套餐里的堡和薯条价值不同，更除不清。<br>
+    让麦当劳 MCP 把每一份食物<b>算到人头、精确到分</b>。</p>
+  </div>
+  <div class="sticker st"><img src="img/4810.png" alt="薯条"></div>
+  <div class="sticker st2"><img src="img/1100.png" alt="巨无霸"></div>
+  <div class="sticker st3"><img src="img/515837.png" alt="圆筒冰淇淋"></div>
+  <div class="sticker st4"><img src="img/9900008754.png" alt="麦旋风"></div>
+  <div class="sticker st5"><img src="img/1406.png" alt="板烧鸡腿堡"></div>
+</header>
+
+<div class="warnbar">离线演示 · 菜单与价格预取自麦当劳官方 MCP 快照 · 未经实时核价</div>
+
+<div class="wrap">
+
+<section>
+  <h2><span class="n">1</span>谁在拼单<small>至少 2 人</small></h2>
+  <div class="row">
+    <input type="text" id="personInput" placeholder="输入名字，回车添加">
+    <button onclick="addPerson()">添加</button>
+  </div>
+  <div class="chips" id="peopleChips"></div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>点了什么<small>套餐自动拆成子项</small></h2>
+  <div class="searchbox">
+    <input type="text" id="foodInput" placeholder="搜菜名：板烧 / 巨无霸 / 薯条 / 双人餐" oninput="searchFood()">
+    <div class="results" id="foodResults"></div>
+  </div>
+  <div id="orderList"><p class="hint">从搜索结果添加食物；套餐自动拆解后，到第 3 步把子项分给每个人。</p></div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>谁吃哪个<small>每个子项选择归属</small></h2>
+  <div id="assignList"><p class="hint">添加食物后，在这里把每个子项分配给具体的人。</p></div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>清算<small>最大余额法 · 债务最小化</small></h2>
+  <button class="big" onclick="settle()">这顿 AA，算清楚</button>
+  <div class="result-card" id="resultCard"></div>
+  <div class="share" id="shareTip" style="display:none">截图发群里，让每个人看到自己的账单 —— <b>除不尽的，交给余数。</b></div>
+</section>
+
+<footer>
+  数据来自麦当劳中国官方 MCP（预取快照）· 商品图为官方物料 · 分摊算法与 CLI 版一致<br>
+  参赛作品 <a href="https://github.com/Pupuiscoming/mcd-remainder" target="_blank">Pupuiscoming/mcd-remainder</a> · 非麦当劳官方产品
+</footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+const meals = SNAPSHOT.meals, combos = SNAPSHOT.combos, nutrition = SNAPSHOT.nutrition;
+let people = [], lines = [];
+const fmt = c => "¥" + (c/100).toFixed(2);
+const IMG = c => `img/${c}.png`;
+
+function addPerson(){
+  const el = document.getElementById('personInput');
+  const name = el.value.trim();
+  if(!name) return;
+  if(people.includes(name)){ el.value=''; return; }
+  people.push(name); el.value=''; renderPeople(); renderAssign();
+}
+document.getElementById('personInput').addEventListener('keydown', e=>{ if(e.key==='Enter') addPerson(); });
+function removePerson(i){ people.splice(i,1); renderPeople(); renderAssign(); }
+function renderPeople(){
+  document.getElementById('peopleChips').innerHTML =
+    people.map((p,i)=>`<span class="chip">${p}<b onclick="removePerson(${i})">✕</b></span>`).join('') ||
+    '<span class="hint">还没有人，先添加 2 个以上</span>';
+}
+
+const SPEC = ["大杯","中杯","小杯","大","中","小","热","冰"];
+function stripSpec(s){ SPEC.forEach(w=>s=(s||"").split(w).join("")); return s.replace(/[【】\[\]()（）\s]/g,""); }
+function kcalOf(name){
+  const base = stripSpec(name);
+  for(const n of nutrition){
+    if(n.productName===name) return +n.kcal||0;
+    if(stripSpec(n.productName)===base) return +n.kcal||0;
+  }
+  for(const n of nutrition){
+    const b=stripSpec(n.productName);
+    if(base&&(b.includes(base)||base.includes(b))) return +n.kcal||0;
+  }
+  return 0;
+}
+
+function searchFood(){
+  const q = document.getElementById('foodInput').value.trim();
+  const box = document.getElementById('foodResults');
+  if(!q){ box.style.display='none'; return; }
+  const hits = [];
+  for(const [code,m] of Object.entries(meals)){
+    if(m.name && m.name.includes(q)) hits.push({code,...m,combo:!!combos[code]});
+    if(hits.length>=8) break;
+  }
+  if(!hits.length){ box.innerHTML='<div style="color:#999;cursor:default">没找到，换个关键词</div>'; box.style.display='block'; return; }
+  box.innerHTML = hits.map(h=>
+    `<div onclick="addFood('${h.code}')"><span class="nm"><img class="thumb" src="${IMG(h.code)}" onerror="this.remove()">${h.name}${h.combo?'<span class="tag">套餐</span>':''}</span><span class="price">¥${h.current_price}</span></div>`
+  ).join('');
+  box.style.display='block';
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.searchbox')) document.getElementById('foodResults').style.display='none';
+});
+
+function addFood(code){
+  document.getElementById('foodResults').style.display='none';
+  document.getElementById('foodInput').value='';
+  const m = meals[code];
+  if(!m || lines.find(l=>l.code===code)) return;
+  const combo = combos[code];
+  lines.push({
+    code, name:m.name, price:Math.round(m.current_price*100),
+    isCombo: !!combo,
+    children: combo ? combo.children.map(c=>({
+      name:c.name, basis:c.unit_price||1, src:c.price_src, person: people[0]||''
+    })) : [{name:m.name, basis:m.original_price||m.current_price, src:'menu', person:people[0]||''}]
+  });
+  renderAssign();
+}
+
+function renderAssign(){
+  const box = document.getElementById('assignList');
+  if(!lines.length){ box.innerHTML='<p class="hint">添加食物后，在这里把每个子项分配给具体的人。</p>'; return; }
+  if(!people.length){ box.innerHTML='<p class="hint">先在第 1 步添加人员。</p>'; return; }
+  box.innerHTML = lines.map((l,li)=>{
+    const kids = l.children.map((c,ci)=>`
+      <div class="child">
+        <span class="nm">${c.name}${(c.src&&c.src!=='menu_code'&&c.src!=='menu_name'&&c.src!=='menu')?' <span class="estimate">估价</span>':''}</span>
+        <span class="basis">¥${(c.basis||0).toFixed(2)}</span>
+        <select onchange="lines[${li}].children[${ci}].person=this.value">
+          ${people.map(p=>`<option ${c.person===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>`).join('');
+    return `<div class="orderline">
+      <div class="head"><img class="thumb" src="${IMG(l.code)}" onerror="this.remove()">
+        <span class="info"><b>${l.name}</b></span>
+        <span class="right"><span class="amt">${fmt(l.price)}</span><span class="del" onclick="lines.splice(${li},1);renderAssign()">✕</span></span></div>
+      <div class="children">${kids}</div></div>`;
+  }).join('');
+}
+
+function apportion(total, weights){
+  const n = weights.length;
+  if(!n) return [];
+  if(!total) return weights.map(()=>0);
+  const s = weights.reduce((a,b)=>a+b,0);
+  if(s<=0) { const base=Math.floor(total/n), out=weights.map(()=>base); out[0]+=total-base*n; return out; }
+  const raw = weights.map(w=>total*w/s);
+  const fl = raw.map(Math.floor);
+  let rem = total - fl.reduce((a,b)=>a+b,0);
+  const order = raw.map((r,i)=>[r-fl[i],i]).sort((a,b)=>b[0]-a[0]);
+  for(let k=0;k<rem;k++) fl[order[k%n][1]]++;
+  return fl;
+}
+
+function settle(){
+  const card = document.getElementById('resultCard');
+  if(people.length<2){ alert('至少需要 2 个人'); return; }
+  if(!lines.length){ alert('先添加食物'); return; }
+  const total = lines.reduce((a,l)=>a+l.price,0);
+  const bills = {}; people.forEach(p=>bills[p]={food:0,kcal:0,items:[]});
+
+  lines.forEach(l=>{
+    const ws = l.children.map(c=>c.basis||1);
+    const parts = apportion(l.price, ws);
+    l.children.forEach((c,i)=>{
+      const p = bills[c.person]; if(!p) return;
+      p.food += parts[i];
+      p.items.push(c.name);
+      p.kcal += kcalOf(c.name);
+    });
+  });
+
+  const now = new Date();
+  const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  let html = `<div class="receipt">
+    <div class="rhead"><div class="logo">McREMAINDER<i> · </i>AA 除不尽</div>
+    <div class="meta">拼单清算收据 · ${ts} · ${people.length} 人</div></div>
+    <div class="rsum"><span>商品合计（MCP 快照价）</span><span class="v">${fmt(total)}</span></div>`;
+
+  people.forEach((p,pi)=>{
+    const b = bills[p];
+    html += `<div class="rperson" style="animation-delay:${pi*0.1}s">
+      <div class="top"><b>${p}</b><span class="money">${(b.food/100).toFixed(2)}</span></div>
+      <ul>${b.items.map(i=>`<li><span>${i}</span></li>`).join('')}</ul>
+      <div class="meta"><span>${b.items.length} 项</span><span class="kcal">${Math.round(b.kcal)} kcal</span></div></div>`;
+  });
+
+  const payer = people[0];
+  const net = people.map(p=>p===payer ? total - bills[p].food : -bills[p].food);
+  const debtors=[], creditors=[];
+  people.forEach((p,i)=>{ if(net[i]<0) debtors.push([p,-net[i]]); else if(net[i]>0) creditors.push([p,net[i]]); });
+  debtors.sort((a,b)=>b[1]-a[1]); creditors.sort((a,b)=>b[1]-a[1]);
+  const transfers=[]; let i=0,j=0;
+  while(i<debtors.length&&j<creditors.length){
+    const pay=Math.min(debtors[i][1],creditors[j][1]);
+    if(pay>0) transfers.push([debtors[i][0],creditors[j][0],pay]);
+    debtors[i][1]-=pay; creditors[j][1]-=pay;
+    if(!debtors[i][1]) i++; if(!creditors[j][1]) j++;
+  }
+
+  html += `<div class="rtransfers"><div class="t-title">— 结算方案 · ${payer} 垫付 · ${transfers.length} 笔结清 —</div>`;
+  transfers.forEach((t,ti)=>{
+    html += `<div class="rtransfer" style="animation-delay:${0.35+ti*0.12}s"><span class="who">${t[0]}</span><span class="arr"></span><span class="who">${t[1]}</span><span class="amt">${fmt(t[2])}</span></div>`;
+  });
+  html += `</div>`;
+
+  const sum = people.reduce((a,p)=>a+bills[p].food,0);
+  const ok = sum===total;
+  html += `<div class="rverify">校验：${fmt(sum)} = 实付 ${fmt(total)} · ${ok?'配平无误':'存在误差'}</div>
+    ${ok?'<div class="stamp"><b>分毫不差</b><span>MCREMAINDER</span></div>':''}
+  </div>`;
+
+  card.innerHTML = html;
+  card.style.display='block';
+  document.getElementById('shareTip').style.display='block';
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+</script>
+</body>
+</html>
